@@ -48,13 +48,14 @@
     UIView *prototype_view_CharacteristicCell  = arr[0];
     _nibViewDict[@"CharacteristicCell"] = prototype_view_CharacteristicCell; 
     
-    self.title = @"peripheral";
+    self.title = @"Central";
     _peripheral.delegate = self;
     self.labelName.text = [NSString stringWithFormat:@"name:%@",_peripheral.name];
     [_peripheral readRSSI];
-    //掃瞄外設Services，成功後會進入方法：-(void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(NSError *)error{
+    //掃瞄外設Services，成功後會進入方法：
+    // -(void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(NSError *)error{
 //    [_peripheral discoverServices:nil];
-    NSLog(@"%s",__FUNCTION__);
+//    NSLog(@"%s",__FUNCTION__);
     
     [self initSpinner];
 }
@@ -62,18 +63,19 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    NSLog(@"%s",__FUNCTION__);
-    if(!firstScan){
-        firstScan = YES;
-        [_peripheral discoverServices:nil];
-        [self showSpinner];
-    }
+//    NSLog(@"%s",__FUNCTION__);
+
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    NSLog(@"%s",__FUNCTION__);
+//    NSLog(@"%s",__FUNCTION__);
+    if(!firstScan){
+        firstScan = YES;
+        [_peripheral discoverServices:nil];
+        [self showSpinner];
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -382,7 +384,7 @@
         [_peripheral discoverCharacteristics:nil forService:service];
         i++;
     }
-    printf("---------------------------\n");
+    
     
 
 //    [self.tableView reloadData];
@@ -407,14 +409,16 @@
         }
         i++;
     }
-    printf("----------------------------\n");
     
-    //获取Characteristic的值，读到数据会进入方法：-(void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
+    
+    // 讀取 Characteristic 的值，若讀到資料，會進入方法
+    // -(void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
     for (CBCharacteristic *characteristic in service.characteristics){
         [peripheral readValueForCharacteristic:characteristic];
     }
     
-    //搜索Characteristic的Descriptors，读到数据会进入方法：-(void)peripheral:(CBPeripheral *)peripheral didDiscoverDescriptorsForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
+    // 搜索 Characteristic 的 Descriptors，讀到資料會進入方法
+    // -(void)peripheral:(CBPeripheral *)peripheral didDiscoverDescriptorsForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
     for (CBCharacteristic *characteristic in service.characteristics){
         [peripheral discoverDescriptorsForCharacteristic:characteristic];
     }
@@ -444,7 +448,7 @@
 
 //搜索到Characteristic的Descriptors
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverDescriptorsForCharacteristic:(CBCharacteristic *)characteristic error:(nullable NSError *)error{
-//    NSLog(@">>> Characteristic Discover Descriptors");
+    NSLog(@">>> Characteristic Discover Descriptors");
     //印出Characteristic和他的Descriptors
 //    NSLog(@"characteristic uuid:%@",characteristic.UUID);
     printf("--------- characteristic ---------\n");
@@ -458,17 +462,15 @@
         printf("%d. %s\n", i+1, [[d.UUID description] UTF8String]);
         i++;
     }
-    printf("----------------------------------\n");
     [self.tableView reloadData];
 
 }
 
-//获取到Descriptors的值
+// 獲取到 Descriptors 的值
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForDescriptor:(CBDescriptor *)descriptor error:(nullable NSError *)error{
     NSLog(@"Descriptor >>> Update Value ");
-    //打印出DescriptorsUUID 和value
-    //这个descriptor都是对于characteristic的描述，一般都是字符串，所以这里我们转换成字符串去解析
-//    NSLog(@"descriptor uuid:%@  value:%@",[NSString stringWithFormat:@"%@",descriptor.UUID],descriptor.value);
+    // 印出 DescriptorsUUID 和value
+    // descriptor 通常是對 characteristic 的描述，所以通常是字串資料
     [self.tableView reloadData];
 
 }
@@ -483,11 +485,12 @@
 
 #pragma mark - write
 
-//写数据
+// 寫入資料
 -(void)writeCharacteristic:(CBPeripheral *)peripheral
             characteristic:(CBCharacteristic *)characteristic
                      value:(NSData *)value{
-    //打印出 characteristic 的权限，可以看到有很多种，这是一个NS_OPTIONS，就是可以同时用于好几个值，常见的有read，write，notify，indicate，知知道这几个基本就够用了，前连个是读写权限，后两个都是通知，两种不同的通知方式。
+    // 印出 characteristic 的權限
+    // 可以發現有很多種，一個 characteristic 可以同時有多種 properties 例如可以同時是 read, notify，或是同時是 read write
     /*
      typedef NS_OPTIONS(NSUInteger, CBCharacteristicProperties) {
      CBCharacteristicPropertyBroadcast            = 0x01,
@@ -504,11 +507,8 @@
     */
     NSLog(@"%lu", (unsigned long)characteristic.properties);
     
-    //只有 characteristic.properties 有write的权限才可以写
+    //只有 characteristic.properties 有 write 的權限才可以寫入
     if(characteristic.properties & CBCharacteristicPropertyWrite){
-        /*
-         最好一个type参数可以为CBCharacteristicWriteWithResponse或type:CBCharacteristicWriteWithResponse,区别是是否会有反馈
-         */
         [peripheral writeValue:value forCharacteristic:characteristic type:CBCharacteristicWriteWithResponse];
     }else{
         NSLog(@"該字段不可寫入！");
@@ -546,21 +546,6 @@
 }
 
 
-
-
-#pragma mark - Navigation
-
-//// In a storyboard-based application, you will often want to do a little preparation before navigation
-//- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-//    
-//    NSLog(@"segue to %@", segue.identifier);
-////    _peripheral = sender;
-////    _peripheral.delegate = self;
-////    self.labelName.text = _peripheral.name;
-////    [_peripheral readRSSI];
-////    //扫描外设Services，成功后会进入方法：-(void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(NSError *)error{
-////    [_peripheral discoverServices:nil];
-//}
 
 
 @end

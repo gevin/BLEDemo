@@ -4,7 +4,6 @@
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
-        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -83,14 +82,6 @@
                                 <state key="normal" title="Scan"/>
                                 <connections>
                                     <action selector="btnScanClicked:" destination="lrO-RE-8A8" eventType="touchUpInside" id="b7t-4o-OjL"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hYh-Va-VQK">
-                                <rect key="frame" x="313" y="79" width="46" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Debug"/>
-                                <connections>
-                                    <action selector="debugClicked:" destination="lrO-RE-8A8" eventType="touchUpInside" id="Uw8-QT-Hcn"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -190,20 +181,20 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="Vs9-vJ-1fC">
-                                <rect key="frame" x="0.0" y="161" width="375" height="506"/>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="Vs9-vJ-1fC">
+                                <rect key="frame" x="0.0" y="155" width="375" height="512"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="rmO-TS-MHt">
-                                <rect key="frame" x="16" y="102" width="277" height="30"/>
+                                <rect key="frame" x="16" y="82" width="277" height="30"/>
                                 <nil key="textColor"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xZ0-79-vwd">
-                                <rect key="frame" x="301" y="102" width="66" height="30"/>
+                                <rect key="frame" x="301" y="82" width="66" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="66" id="aIy-b6-tCq"/>
                                 </constraints>
@@ -212,14 +203,23 @@
                                     <action selector="notifyClicked:" destination="bEG-iT-CIb" eventType="touchUpInside" id="YsA-hq-25c"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5zF-YH-hzi">
+                                <rect key="frame" x="16" y="117" width="36" height="30"/>
+                                <state key="normal" title="Clear"/>
+                                <connections>
+                                    <action selector="clearClicked:" destination="bEG-iT-CIb" eventType="touchUpInside" id="8O9-0T-Fed"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="Vs9-vJ-1fC" firstAttribute="top" secondItem="rmO-TS-MHt" secondAttribute="bottom" constant="43" id="ALm-cL-XlY"/>
                             <constraint firstItem="cuh-tW-pk0" firstAttribute="trailing" secondItem="Vs9-vJ-1fC" secondAttribute="trailing" id="DNZ-iZ-OvH"/>
+                            <constraint firstItem="5zF-YH-hzi" firstAttribute="leading" secondItem="cuh-tW-pk0" secondAttribute="leading" constant="16" id="Hlg-Rx-bXF"/>
                             <constraint firstItem="cuh-tW-pk0" firstAttribute="trailing" secondItem="xZ0-79-vwd" secondAttribute="trailing" constant="8" id="LeE-H4-VuQ"/>
                             <constraint firstItem="Vs9-vJ-1fC" firstAttribute="leading" secondItem="cuh-tW-pk0" secondAttribute="leading" id="UEC-X5-SRz"/>
-                            <constraint firstItem="rmO-TS-MHt" firstAttribute="top" secondItem="cuh-tW-pk0" secondAttribute="top" constant="38" id="WIC-gd-IAh"/>
-                            <constraint firstItem="Vs9-vJ-1fC" firstAttribute="top" secondItem="cuh-tW-pk0" secondAttribute="top" constant="97" id="cPR-lk-QfJ"/>
+                            <constraint firstItem="Vs9-vJ-1fC" firstAttribute="top" secondItem="5zF-YH-hzi" secondAttribute="bottom" constant="8" id="UcE-IF-dOh"/>
+                            <constraint firstItem="rmO-TS-MHt" firstAttribute="top" secondItem="cuh-tW-pk0" secondAttribute="top" constant="18" id="WIC-gd-IAh"/>
                             <constraint firstItem="xZ0-79-vwd" firstAttribute="centerY" secondItem="rmO-TS-MHt" secondAttribute="centerY" id="lea-sn-sjI"/>
                             <constraint firstItem="cuh-tW-pk0" firstAttribute="bottom" secondItem="Vs9-vJ-1fC" secondAttribute="bottom" id="niN-xB-k1j"/>
                             <constraint firstItem="xZ0-79-vwd" firstAttribute="leading" secondItem="rmO-TS-MHt" secondAttribute="trailing" constant="8" id="uOz-DA-Plr"/>
@@ -235,7 +235,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="IyQ-OH-JXq" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-666" y="247"/>
+            <point key="canvasLocation" x="-666.39999999999998" y="246.9265367316342"/>
         </scene>
     </scenes>
 </document>

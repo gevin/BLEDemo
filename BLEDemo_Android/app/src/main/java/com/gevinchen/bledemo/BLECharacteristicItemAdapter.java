@@ -85,22 +85,23 @@ public class BLECharacteristicItemAdapter extends BaseAdapter {
         String description = characteristic.toString();
         int properties = characteristic.getProperties();
         String propertyString = "";
-        if((properties & 1) > 0) propertyString = propertyString + " Broadcast";
-        if((properties & 2) > 0) propertyString = propertyString + " Read";
-        if((properties & 4) > 0) {
+        if((properties & BluetoothGattCharacteristic.PROPERTY_BROADCAST) > 0) propertyString = propertyString + " Broadcast";
+        if((properties & BluetoothGattCharacteristic.PROPERTY_READ) > 0) propertyString = propertyString + " Read";
+        if((properties & BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE) > 0) {
             propertyString = propertyString + " WriteWithoutResponse";
         }
-        if((properties & 8) > 0){
+        if((properties & BluetoothGattCharacteristic.PROPERTY_WRITE) > 0){
             propertyString = propertyString + " Write";
         }
-        if((properties & 16) > 0){
+        if((properties & BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0){
             propertyString = propertyString + " Notify";
         }
-        if((properties & 32) > 0) propertyString = propertyString + " Indicate";
-        if((properties & 64) > 0) propertyString = propertyString + " AuthenticatedSignedWrites";
-        if((properties & 128) > 0) propertyString = propertyString + " ExtendedProperties";
-        if((properties & 256) > 0) propertyString = propertyString + " NotifyEncryptionRequired";
-        if((properties & 512) > 0) propertyString = propertyString + " IndicateEncryptionRequired";
+        if((properties & BluetoothGattCharacteristic.PROPERTY_INDICATE) > 0) propertyString = propertyString + " Indicate";
+        if((properties & BluetoothGattCharacteristic.PROPERTY_SIGNED_WRITE) > 0) propertyString = propertyString + " AuthenticatedSignedWrites";
+        if((properties & BluetoothGattCharacteristic.PROPERTY_EXTENDED_PROPS) > 0) propertyString = propertyString + " ExtendedProperties";
+        //  這兩個 iOS 有定義
+//        if((properties & 256) > 0) propertyString = propertyString + " NotifyEncryptionRequired";
+//        if((properties & 512) > 0) propertyString = propertyString + " IndicateEncryptionRequired";
         if(propertyString.length() == 0) propertyString = "none";
 
         if((properties & 4) > 0 || (properties & 8) > 0){

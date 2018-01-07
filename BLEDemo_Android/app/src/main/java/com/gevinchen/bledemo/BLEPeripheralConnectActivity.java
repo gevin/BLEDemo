@@ -95,10 +95,9 @@ import java.util.UUID;
 
 public class BLEPeripheralConnectActivity extends AppCompatActivity {
 
-
     private String service_uuid = "A3243425-22B7-43BC-B71C-AD44367F36DD";
-    private String characteristic_write_uuid = "49BC4442-F0C6-4755-A309-D7592A5AFA23";
-    private String characteristic_notify_uuid = "0CE7A115-BAD7-4263-A06B-01EE822A9E49";
+    private String characteristic_write_uuid = "A3243425-22B7-43BC-B71C-AD44367F36DD";
+    private String characteristic_notify_uuid = "A3243426-22B7-43BC-B71C-AD44367F36DD";
     private String descriptor_client_characteristic_Configuration = "2902";
 
     BluetoothDevice device;
@@ -276,12 +275,20 @@ public class BLEPeripheralConnectActivity extends AppCompatActivity {
             List <BluetoothGattService>services = gatt.getServices();
 
             for ( BluetoothGattService service : services){
-                String serviceDesc = service.getUuid().toString();
-                Log.v("BLEService",serviceDesc);
+                String serviceUUIDString = service.getUuid().toString();
+                //  只找我另一個 demo 的 UUID
+                if (!serviceUUIDString.toUpperCase().equals(service_uuid)) continue;
+
+                Log.v("BLEService",serviceUUIDString);
                 List<BluetoothGattCharacteristic> characteristicsList = service.getCharacteristics();
                 for (BluetoothGattCharacteristic characteristic : characteristicsList ){
                     String description = characteristic.toString();
                     int properties = characteristic.getProperties();
+
+                    if((properties & BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0){
+                        subscribeNotification(mGatt,characteristic);
+                    }
+
 
                     String uuidstr = characteristic.getUuid().toString();
                     String value = "";
@@ -366,7 +373,8 @@ public class BLEPeripheralConnectActivity extends AppCompatActivity {
         }
 
         /**
-         * Callback triggered as a result of a remote characteristic notification.
+         *
+         * 當 peripheral 發出 NOTIFY 然後主設備這裡收到後，會呼叫這裡
          *
          * @param gatt GATT client the characteristic is associated with
          * @param characteristic Characteristic that has been updated as a result
@@ -496,6 +504,12 @@ public class BLEPeripheralConnectActivity extends AppCompatActivity {
             }
 
             log("Received message: " + message);
+            //  更新 LIST VIEW
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    mLstAdapter.notifyDataSetChanged();
+                }
+            });
         }
     }
 

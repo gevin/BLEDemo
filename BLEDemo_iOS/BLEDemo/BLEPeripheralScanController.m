@@ -13,9 +13,9 @@
 
 @interface BLEPeripheralScanController () <UITableViewDelegate, UITableViewDataSource, CBCentralManagerDelegate>
 {
-    //系统蓝牙设备管理对象，可以把他理解为主设备，通过他，可以去扫描和链接外设
+    //藍牙設備的管理物件，可透過它去掃瞄、連接週邊設備
     CBCentralManager *_centralManager;
-    //用于保存被发现设备
+    //記錄掃瞄發現的週邊設備
     NSMutableArray *_peripherals;    
     
     NSDictionary *_advertismentDict;
@@ -33,7 +33,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+    self.title = @"Scan";
     // 初始化主設備物件，配置 CBCentralManagerDelegate 的 delegate 與 queue 執行緒，若給 nil 預設指定用 main thread
     _centralManager = [[CBCentralManager alloc]initWithDelegate:self queue:dispatch_get_main_queue()];
     _peripherals = [[NSMutableArray alloc] init];
@@ -45,9 +45,9 @@
     
 }
 
-- (void)viewWillAppear:(BOOL)animated
+- (void)viewDidAppear:(BOOL)animated
 {
-    [super viewWillAppear:animated];
+    [super viewDidAppear:animated];
     if(!firstScan){
         firstScan = YES;
         [self startScan];
@@ -112,7 +112,7 @@
 
 #pragma mark - CBCentralManagerDelegate
 
-//主设备状态改变的委托，在初始化CBCentralManager的适合会打开设备，只有当设备正确打开后才能使用
+// 主設備狀態改變後會觸發，在 CBCentralManagerStatePoweredOn 狀態才是正確開啟
 - (void)centralManagerDidUpdateState:(CBCentralManager *)central{
     switch (central.state) {
         case CBManagerStateUnknown:
@@ -218,7 +218,7 @@
      - (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error;//断开外设的委托
      */
     CBPeripheral *peripheral = _peripherals[indexPath.row];
-    //连接设备
+    // 連接週邊設備
     [_centralManager connectPeripheral:peripheral options:nil];
 }
 

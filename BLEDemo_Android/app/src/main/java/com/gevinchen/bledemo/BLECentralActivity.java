@@ -183,6 +183,7 @@ public class BLECentralActivity extends AppCompatActivity {
     /* 開始搜尋 BLE 設備，5秒後停止 */
     void startScan( int seconds )
     {
+        mBluetoothDevices.clear();
         if(spinner_scan.getVisibility() == View.INVISIBLE) {
             // 開始搜尋 BLE 設備
             mLeScanner.startScan(mDeviceLeScanCallback);

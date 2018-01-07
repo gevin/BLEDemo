@@ -144,23 +144,7 @@ public class BLEPeripheralActivity extends AppCompatActivity {
         public void onConnectionStateChange(BluetoothDevice device, int status, int newState) {
             super.onConnectionStateChange(device, status, newState);
 
-            String stateString = "";
             String newStateString = "";
-
-            switch (status){
-            case BluetoothProfile.STATE_DISCONNECTED:
-                stateString = "disconnected";
-                break;
-            case BluetoothProfile.STATE_CONNECTING:
-                stateString = "connecting";
-                break;
-            case BluetoothProfile.STATE_CONNECTED:
-                stateString = "connected";
-                break;
-            case BluetoothProfile.STATE_DISCONNECTING:
-                stateString = "disconnecting";
-                break;
-            }
 
             switch (newState){
                 case BluetoothProfile.STATE_DISCONNECTED:
@@ -181,7 +165,7 @@ public class BLEPeripheralActivity extends AppCompatActivity {
                     break;
             }
 
-            log("onConnectionStateChange status:" + stateString + " newState:" + newStateString);
+            log("onConnectionStateChange state:" + newStateString);
 
         }
 

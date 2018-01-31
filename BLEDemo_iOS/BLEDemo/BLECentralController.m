@@ -26,6 +26,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *labelName;
 @property (weak, nonatomic) IBOutlet UILabel *labelRSSI;
 @property (weak, nonatomic) IBOutlet UILabel *labelDistance;
+@property (weak, nonatomic) IBOutlet UITextView *textLog;
 
 @end
 
@@ -43,6 +44,7 @@
     
     UINib *nib = [UINib nibWithNibName:@"CharacteristicCell" bundle:nil];
     [self.tableView registerNib:nib forCellReuseIdentifier:@"CharacteristicCell"];
+    self.tableView.estimatedRowHeight = 105;
     
     NSArray *arr = [nib instantiateWithOwner:nil options:nil];
     UIView *prototype_view_CharacteristicCell  = arr[0];
@@ -85,6 +87,13 @@
     [self.centerManager cancelPeripheralConnection:self.peripheral];
 }
 
+#pragma mark - Log
+
+- (void)addLog:(NSString*)string
+{
+    self.textLog.text = [NSString stringWithFormat:@"%@%@\n", self.textLog.text, string]; 
+}
+
 #pragma mark - Button Action
 
 - (IBAction)scanServiceClicked:(id)sender
@@ -122,17 +131,17 @@
     return _servicesList.count;
 }
 
-- (NSString*)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
-{
-    if(_servicesList.count==0){
-        return nil;
-    } 
-    CBService *service = _servicesList[section];
-    if(service){
-        return [service.UUID description];
-    }
-    return nil;
-}
+//- (NSString*)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+//{
+//    if(_servicesList.count==0){
+//        return nil;
+//    } 
+//    CBService *service = _servicesList[section];
+//    if(service){
+//        return [service.UUID description];
+//    }
+//    return nil;
+//}
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     if(_servicesList.count==0){
@@ -205,52 +214,11 @@
     
     // uuid
     cell.labelCharacteristicDesc.text = [characteristic.UUID description];
-    // properties
-    NSMutableString *propertiesString = [[NSMutableString alloc] initWithCapacity:100];
-    if(characteristic.properties & CBCharacteristicPropertyBroadcast){
-        [propertiesString appendString:@"Broadcast "];
-    }
-    if(characteristic.properties & CBCharacteristicPropertyRead){
-        [propertiesString appendString:@"Read "];
-        cell.btnRead.hidden = NO;
-    }
-    if(characteristic.properties & CBCharacteristicPropertyWriteWithoutResponse){            
-        [propertiesString appendString:@"WriteWithoutResponse "];
-        cell.btnWrite.hidden = NO;
-        cell.textField.hidden = NO;
-    }
-    if(characteristic.properties & CBCharacteristicPropertyWrite){
-        [propertiesString appendString:@"Write "];
-        cell.btnWrite.hidden = NO;
-        cell.textField.hidden = NO;
-    }
-    if(characteristic.properties & CBCharacteristicPropertyNotify){
-        [propertiesString appendString:@"Notify "]; 
-    }
-    if(characteristic.properties & CBCharacteristicPropertyIndicate){
-        [propertiesString appendString:@"Indicate "];
-    }
-    if(characteristic.properties & CBCharacteristicPropertyAuthenticatedSignedWrites){
-        [propertiesString appendString:@"AuthenticatedSignedWrites "];
-    }
-    if(characteristic.properties & CBCharacteristicPropertyExtendedProperties){
-        [propertiesString appendString:@"ExtendedProperties "];
-    }
-    if(characteristic.properties & CBCharacteristicPropertyNotifyEncryptionRequired){
-        [propertiesString appendString:@"NotifyEncryptionRequired "];
-    }
-    if(characteristic.properties & CBCharacteristicPropertyIndicateEncryptionRequired){
-        [propertiesString appendString:@"IndicateEncryptionRequired "];
-    }
-    if(propertiesString.length==0){
-        [propertiesString appendString:@"unknown "];
-    }
-    cell.labelProperty.text = propertiesString;
-       
-    // value
-    NSString *string = [[NSString alloc] initWithData:characteristic.value encoding:NSUTF8StringEncoding];
-    cell.labelValue.text = [NSString stringWithFormat:@"value:%@", string];
     
+    // properties
+    [cell setMode:characteristic.properties];
+    [cell setProperty:characteristic.properties];
+       
     // descriptor
     int i=0;
     NSMutableString *mstring = [[NSMutableString alloc] initWithCapacity:100];
@@ -279,7 +247,7 @@
     NSValue *value = [NSValue valueWithNonretainedObject:service];
     NSMutableArray *charList = _characteristicsListDict[value];
     CBCharacteristic *characteristic = charList[sender.tag];
-    NSLog(@"read characteristic: %@", characteristic.UUID);
+    [self addLog:[NSString stringWithFormat:@"read characteristic: %@", characteristic.UUID]];
     [self.peripheral readValueForCharacteristic:characteristic];
 }
 
@@ -290,7 +258,7 @@
     NSValue *value = [NSValue valueWithNonretainedObject:service];
     NSMutableArray *charList = _characteristicsListDict[value];
     CBCharacteristic *characteristic = charList[sender.tag];
-    NSLog(@"write characteristic: %@", cell.textField.text);
+    [self addLog:[NSString stringWithFormat:@"write characteristic: %@", cell.textField.text]];
     
     [self writeCharacteristic:self.peripheral characteristic:characteristic value:[cell.textField.text dataUsingEncoding:NSUTF8StringEncoding] ];
 }
@@ -299,18 +267,19 @@
 #pragma mark - CBPeripheralDelegate
 
 - (void)peripheralDidUpdateRSSI:(CBPeripheral *)peripheral error:(nullable NSError *)error{
-    NSLog(@"peripheral >>> Update RSSI");
+//    NSLog(@"peripheral >>> Update RSSI");
     [peripheral readRSSI];
 }
 
 // 當執行 [peripheral readRSSI] 時，會呼叫此方法
 - (void)peripheral:(CBPeripheral *)peripheral didReadRSSI:(NSNumber *)RSSI error:(nullable NSError *)error{
-    NSLog(@"peripheral >>> Read RSSI");
+//    NSLog(@"peripheral >>> Read RSSI");
     if (error){
-        NSLog(@">>> Read RSSI for %@ with error: %@", peripheral.name, [error localizedDescription]);
+        NSString *errorStr = [NSString stringWithFormat:@">>> Read RSSI for %@ with error: %@", peripheral.name, [error localizedDescription] ];
+        [self addLog:errorStr];
         return;
     }
-    NSLog(@"RSSI:%@", [RSSI stringValue]);
+    [self addLog:[NSString stringWithFormat:@"RSSI:%@", [RSSI stringValue]]];
     self.labelRSSI.text = [NSString stringWithFormat:@"rssi:%@",[RSSI stringValue]];
     CGFloat ci = ([RSSI intValue] - 49) / (10 * 4.);
     CGFloat distance = pow(10,ci);
@@ -320,25 +289,25 @@
 
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverIncludedServicesForService:(CBService *)service error:(nullable NSError *)error
 {
-    NSLog(@"peripheral >>> Discover Included Services For Service");
+//    NSLog(@"peripheral >>> Discover Included Services For Service");
     
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateNotificationStateForCharacteristic:(CBCharacteristic *)characteristic error:(nullable NSError *)error{
-    NSLog(@"peripheral >>> Update Notification State For Characteristic");
+//    NSLog(@"peripheral >>> Update Notification State For Characteristic");
 }
 
 - (void)peripheralIsReadyToSendWriteWithoutResponse:(CBPeripheral *)peripheral{
-    NSLog(@"peripheral >>> Peripheral Is Ready To Send Write Without Response");
+//    NSLog(@"peripheral >>> Peripheral Is Ready To Send Write Without Response");
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didOpenL2CAPChannel:(nullable CBL2CAPChannel *)channel error:(nullable NSError *)error{
-    NSLog(@"peripheral >>> Did Open L2CAP Channel");
+//    NSLog(@"peripheral >>> Did Open L2CAP Channel");
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didModifyServices:(nonnull NSArray<CBService *> *)invalidatedServices
 {
-    NSLog(@"peripheral >>> Did Modify Services");
+//    NSLog(@"peripheral >>> Did Modify Services");
     // 
     int i=0;
     while (_servicesList.count>i) {
@@ -369,13 +338,13 @@
         return;
     }
     
-    printf("--------- peripheral ---------\n");
-    printf("services\n");
+//    printf("--------- peripheral ---------\n");
+//    printf("services\n");
     int i=0;
     for (CBService *service in peripheral.services){
         //NSLog(@"service %@",[service.UUID UUIDString]);
         NSArray *characteristicArr = [service characteristics];
-        printf("%d. %s, characteristic count:%d\n", i+1, [[service.UUID description] UTF8String], characteristicArr.count);
+//        printf("%d. %s, characteristic count:%d\n", i+1, [[service.UUID description] UTF8String], characteristicArr.count);
         [_servicesList addObject:service];
         NSValue *value = [NSValue valueWithNonretainedObject:service];
         _characteristicsListDict[value] = [[NSMutableArray alloc] init];
@@ -384,9 +353,6 @@
         [_peripheral discoverCharacteristics:nil forService:service];
         i++;
     }
-    
-    
-
 //    [self.tableView reloadData];
 }
 
@@ -395,13 +361,13 @@
     
     NSValue *value = [NSValue valueWithNonretainedObject:service];
     NSMutableArray *charList = _characteristicsListDict[value];
-    printf("--------- service ---------\n");
-    printf("%s\n", [[service.UUID description] UTF8String]);
-    printf("---------------------------\n");
-    printf("characteristic\n");
+//    printf("--------- service ---------\n");
+//    printf("%s\n", [[service.UUID description] UTF8String]);
+//    printf("---------------------------\n");
+//    printf("characteristic\n");
     int i=0;
     for (CBCharacteristic *characteristic in service.characteristics) {
-        printf("%d. %s\n", i+1, [[characteristic.UUID UUIDString] UTF8String]);
+//        printf("%d. %s\n", i+1, [[characteristic.UUID UUIDString] UTF8String]);
         
         [charList addObject:characteristic];
         if(characteristic.properties & CBCharacteristicPropertyNotify){
@@ -429,18 +395,20 @@
 
 //獲取的charateristic的值，收到 notify 或是執行 read 都會進入此方法
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(nullable NSError *)error{
-    NSLog(@"Characteristic >>> Update Value");
+//    NSLog(@"Characteristic >>> Update Value");
     
     //印出characteristic的UUID和值
     NSString *valueString = [[NSString alloc] initWithData:characteristic.value encoding:NSUTF8StringEncoding];
-    NSLog(@"characteristic uuid:%@  value:%@",characteristic.UUID,valueString);
+//    NSLog(@"characteristic uuid:%@  value:%@",characteristic.UUID,valueString);
+    [self addLog:[NSString stringWithFormat:@"receive:%@ \nfrom:%@",valueString,characteristic.UUID]];
+    
     [self.tableView reloadData];
     [self hideSpinner];
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didWriteValueForCharacteristic:(CBCharacteristic *)characteristic error:(nullable NSError *)error{
-    NSLog(@"Characteristic >>> Did Write Value");
-    
+//    NSLog(@"Characteristic >>> Did Write Value");
+    [self addLog:@"write success!"];
 }
 
 
@@ -448,27 +416,27 @@
 
 //搜索到Characteristic的Descriptors
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverDescriptorsForCharacteristic:(CBCharacteristic *)characteristic error:(nullable NSError *)error{
-    NSLog(@">>> Characteristic Discover Descriptors");
+//    NSLog(@">>> Characteristic Discover Descriptors");
     //印出Characteristic和他的Descriptors
 //    NSLog(@"characteristic uuid:%@",characteristic.UUID);
-    printf("--------- characteristic ---------\n");
-    printf("%s\n", [[characteristic.UUID description] UTF8String]);
-    NSString *valueString = [[NSString alloc] initWithData:characteristic.value encoding:NSUTF8StringEncoding];
-    printf("value:%s\n",[valueString UTF8String] );
-    printf("----------------------------------\n");
-    printf("Descriptor\n");
-    int i=0;
-    for (CBDescriptor *d in characteristic.descriptors) {
-        printf("%d. %s\n", i+1, [[d.UUID description] UTF8String]);
-        i++;
-    }
+//    printf("--------- characteristic ---------\n");
+//    printf("%s\n", [[characteristic.UUID description] UTF8String]);
+//    NSString *valueString = [[NSString alloc] initWithData:characteristic.value encoding:NSUTF8StringEncoding];
+//    printf("value:%s\n",[valueString UTF8String] );
+//    printf("----------------------------------\n");
+//    printf("Descriptor\n");
+//    int i=0;
+//    for (CBDescriptor *d in characteristic.descriptors) {
+//        printf("%d. %s\n", i+1, [[d.UUID description] UTF8String]);
+//        i++;
+//    }
     [self.tableView reloadData];
 
 }
 
 // 獲取到 Descriptors 的值
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForDescriptor:(CBDescriptor *)descriptor error:(nullable NSError *)error{
-    NSLog(@"Descriptor >>> Update Value ");
+//    NSLog(@"Descriptor >>> Update Value ");
     // 印出 DescriptorsUUID 和value
     // descriptor 通常是對 characteristic 的描述，所以通常是字串資料
     [self.tableView reloadData];
@@ -476,7 +444,7 @@
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didWriteValueForDescriptor:(CBDescriptor *)descriptor error:(nullable NSError *)error{
-    NSLog(@"Descriptor >>> Write Value ");
+//    NSLog(@"Descriptor >>> Write Value ");
 
     
 }
@@ -505,13 +473,15 @@
      CBCharacteristicPropertyIndicateEncryptionRequired NS_ENUM_AVAILABLE(NA, 6_0) = 0x200
      };
     */
-    NSLog(@"%lu", (unsigned long)characteristic.properties);
     
+    NSLog(@"%lu", (unsigned long)characteristic.properties);
+    // Note: 測試起來傳給 android 一次只能傳 20 字，不曉得是不是 andoroid 的限制
+    // https://github.com/don/cordova-plugin-ble-central/issues/234
     //只有 characteristic.properties 有 write 的權限才可以寫入
     if(characteristic.properties & CBCharacteristicPropertyWrite){
         [peripheral writeValue:value forCharacteristic:characteristic type:CBCharacteristicWriteWithResponse];
     }else{
-        NSLog(@"該字段不可寫入！");
+        [self addLog:@"該字段不可寫入！"];
     }
 }
 

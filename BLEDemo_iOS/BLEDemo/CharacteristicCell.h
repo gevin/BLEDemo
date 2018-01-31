@@ -11,11 +11,16 @@
 @interface CharacteristicCell : UITableViewCell
 @property (weak, nonatomic) IBOutlet UILabel *labelCharacteristicDesc;
 @property (weak, nonatomic) IBOutlet UILabel *labelProperty;
-@property (weak, nonatomic) IBOutlet UILabel *labelValue;
 @property (weak, nonatomic) IBOutlet UILabel *labelDescriptor;
 @property (weak, nonatomic) IBOutlet UITextField *textField;
 @property (weak, nonatomic) IBOutlet UIButton *btnRead;
 @property (weak, nonatomic) IBOutlet UIButton *btnWrite;
 @property (nonatomic) BOOL isNew; 
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *constraint_Label_Desc_bottom;
+
+
+- (void)setMode:(NSUInteger)property;
+- (void)setProperty:(NSUInteger)property;
+
 
 @end

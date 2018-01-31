@@ -29,6 +29,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.view.View;
 import android.content.Intent;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -52,7 +53,6 @@ public class BLECentralActivity extends AppCompatActivity {
     Button btnScan;
     Button btnStopScan;
     ProgressBar spinner_scan;
-
     BluetoothManager mBluetoothManager;
     BluetoothAdapter mBluetoothAdapter;
     BluetoothLeScanner mLeScanner;
@@ -82,7 +82,6 @@ public class BLECentralActivity extends AppCompatActivity {
         btnStopScan = this.findViewById(R.id.button_stopscan);
         spinner_scan = this.findViewById(R.id.progressBar_scan);
         listView = this.findViewById(R.id.listView_devices);
-
         /**
          * Gevin note: 第一次執行時遇到 java.lang.SecurityException: Need ACCESS_COARSE_LOCATION or ACCESS_FINE_LOCATION permission to get scan results
          *
@@ -270,4 +269,5 @@ public class BLECentralActivity extends AppCompatActivity {
                 break;
         }
     }
+
 }
